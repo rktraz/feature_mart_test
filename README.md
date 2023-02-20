@@ -33,7 +33,7 @@ pip install modal-client
 modal token new
 ```
 
-3. (Set up)[https://modal.com/secrets] Hopsworks API Key.
+3. [Set up](https://modal.com/secrets) Hopsworks API Key.
 
 `HOPSWORKS_API_KEY`
 
