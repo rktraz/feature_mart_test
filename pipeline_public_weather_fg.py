@@ -101,7 +101,7 @@ def get_weather_data(city_name: str,
     })
     
     # Change columns order
-    res_df = res_df[["city_name", "base_time", "forecast_hr", "temperature",
+    res_df = res_df[["city_name", "base_time", "forecast_hr", "temperature", "precipitation",
                      "relative_humidity", "weather_code", "wind_speed", "wind_direction"]]
     
     # Convert dates
@@ -135,7 +135,7 @@ def main():
     # Get date parameters
     today = datetime.date.today() # datetime object
 
-    day7next = str(today + datetime.timedelta(6))# "yyyy-mm-dd"
+    day7next = str(today + datetime.timedelta(7))# "yyyy-mm-dd"
     day7ago = str(today - datetime.timedelta(7)) # "yyyy-mm-dd"
 
     # Parse and insert updated data from observations endpoint
