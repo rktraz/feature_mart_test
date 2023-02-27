@@ -1,32 +1,12 @@
 # Imports
 import requests
-import json
 import datetime
 
 import pandas as pd
 import numpy as np
 
 import hopsworks
-import modal
 from geopy.geocoders import Nominatim
-
-
-LOCAL = False
-
-if LOCAL == False:
-    # Create a modal.Stub instance 
-    stub = modal.Stub(name="pipeline_public_weather_fg")
-
-    # Create a custom image
-    image = modal.Image.debian_slim().pip_install(["pandas", "requests", "hopsworks", "geopy"]) 
-
-    @stub.function(
-        schedule=modal.Period(days=1), 
-        image=image, 
-        secret=modal.Secret.from_name("HOPSWORKS_API_KEY")
-    )
-    def modal_pipeline():        
-        main()
 
 
 def get_city_coordinates(city_name: str):
@@ -159,9 +139,4 @@ def main():
 
 
 if __name__ == "__main__":
-    if LOCAL == True:
-        main()
-    else:
-        stub.deploy("pipeline_public_weather_fg")
-        with stub.run():
-            modal_pipeline.call()
+    main()

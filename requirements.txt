@@ -1,0 +1,5 @@
+hopsworks
+requests
+pandas
+numpy
+geopy
