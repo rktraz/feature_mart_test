@@ -24,4 +24,4 @@ jobs:
       - name: execute Feature Pipeline
         env: 
           HOPSWORKS_API_KEY: ${{ secrets.HOPSWORKS_API_KEY }}
-        run: python ./pipeline_public_weather_fg.py
+        run: python ./pipeline_public_weather_fg_actions.py

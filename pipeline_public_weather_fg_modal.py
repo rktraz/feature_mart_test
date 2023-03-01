@@ -1,18 +1,47 @@
 # Imports
 import requests
+import json
 import datetime
 
 import pandas as pd
 import numpy as np
 
 import hopsworks
+import modal
 from geopy.geocoders import Nominatim
+
+
+LOCAL = False
+
+if LOCAL == False:
+    # Create a modal.Stub instance 
+    stub = modal.Stub(name="pipeline_public_weather_fg")
+
+    # Create a custom image
+    image = modal.Image.debian_slim().pip_install(["pandas", "requests", "hopsworks", "geopy"]) 
+
+    @stub.function(
+        schedule=modal.Period(days=1), 
+        image=image, 
+        secret=modal.Secret.from_name("HOPSWORKS_API_KEY")
+    )
+    def modal_pipeline():        
+        main()
+
+
+def convert_date_to_unix(x):
+    """
+    Convert datetime to unix time in milliseconds.
+    """
+    dt_obj = datetime.datetime.strptime(str(x), '%Y-%m-%d %H:%M:%S')
+    dt_obj = int(dt_obj.timestamp() * 1000)
+    return dt_obj
 
 
 def get_city_coordinates(city_name: str):
     """
     Takes city name and returns its latitude and longitude (rounded to 2 digits after dot).
-    """   
+    """    
     # Initialize Nominatim API (for getting lat and long of the city)
     geolocator = Nominatim(user_agent="MyApp")
     city = geolocator.geocode(city_name)
@@ -47,22 +76,23 @@ def get_weather_data(city_name: str,
     }
     
     if forecast:
-        # Historical forecast endpoint
+        # historical forecast endpoint
         base_url = 'https://api.open-meteo.com/v1/forecast' 
     else:
-        # Historical observations endpoint
+        # historical observations endpoint
         base_url = 'https://archive-api.open-meteo.com/v1/archive?' 
         
     response = requests.get(base_url, params=params)
-    
+
     response_json = response.json()
-    
+
     some_metadata = {key: response_json[key] for key in ('latitude', 'longitude',
                                                          'timezone', 'hourly_units')}
     
+    
     res_df = pd.DataFrame(response_json["hourly"])
     
-    res_df["forecast_hr"] = 0 # By default fill it with zeroes
+    res_df["forecast_hr"] = 0
     
     if forecast:
         res_df["forecast_hr"] = res_df.index
@@ -70,7 +100,7 @@ def get_weather_data(city_name: str,
     some_metadata["city_name"] = city_name
     res_df["city_name"] = city_name
     
-    # Rename columns
+    # rename columns
     res_df = res_df.rename(columns={
         "time": "base_time",
         "temperature_2m": "temperature",
@@ -80,12 +110,15 @@ def get_weather_data(city_name: str,
         "winddirection_10m": "wind_direction"
     })
     
-    # Change columns order
+    # change columns order
     res_df = res_df[["city_name", "base_time", "forecast_hr", "temperature", "precipitation",
                      "relative_humidity", "weather_code", "wind_speed", "wind_direction"]]
     
-    # Convert dates
+    # convert dates in 'base_time' column
     res_df["base_time"] = pd.to_datetime(res_df["base_time"])
+    
+    # create 'unix' columns
+    res_df["unix_time"] = res_df["base_time"].apply(convert_date_to_unix)
     
     return res_df, some_metadata
 
@@ -115,7 +148,7 @@ def main():
     # Get date parameters
     today = datetime.date.today() # datetime object
 
-    day7next = str(today + datetime.timedelta(7))# "yyyy-mm-dd"
+    day7next = str(today + datetime.timedelta(6))# "yyyy-mm-dd"
     day7ago = str(today - datetime.timedelta(7)) # "yyyy-mm-dd"
 
     # Parse and insert updated data from observations endpoint
@@ -139,4 +172,9 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    if LOCAL == True:
+        main()
+    else:
+        stub.deploy("pipeline_public_weather_fg")
+        with stub.run():
+            modal_pipeline.call()
