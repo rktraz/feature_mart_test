@@ -1,10 +1,8 @@
 # Imports
 import requests
-import json
 import datetime
 
 import pandas as pd
-import numpy as np
 
 import hopsworks
 import modal
@@ -141,7 +139,7 @@ def main():
         'New_York',
         'Los_Angeles',
         'Singapore',
-        'Sidney',
+        'Sydney',
         'Hong_Kong',
         'Rome'
     ]

@@ -126,7 +126,7 @@ def main():
         'New_York',
         'Los_Angeles',
         'Singapore',
-        'Sidney',
+        'Sydney',
         'Hong_Kong',
         'Rome'
     ]
