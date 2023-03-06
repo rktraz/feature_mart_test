@@ -33,13 +33,17 @@ To schedule a Feature Pipeline we are using [GitHub Actions](https://github.com/
 
 ![2.png](images/api_key.png)
 
----
+
 3. Add your `HOPSWORKS_API_KEY` to **Actions secrets and variables**.
 
 ![3.png](images/set_up_api.png)
-![4.png](images/create_api.png)
 
 ---
+![4.png](images/create_api.png)
+
+
 4. Besides scheduling, you can run your workflow manually.
 ![5.png](images/github_actions.png)
+
+---
 ![6.png](images/feature_pipe_run.png)
