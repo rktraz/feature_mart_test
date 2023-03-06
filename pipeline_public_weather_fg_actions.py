@@ -6,6 +6,7 @@ import pandas as pd
 
 import hopsworks
 from geopy.geocoders import Nominatim
+
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -103,48 +104,55 @@ def get_weather_data(city_name: str,
     return res_df, some_metadata
 
 
+def data_preparation(weather_fg):
+    # Define required cities
+    city_names = [
+        'Kyiv',
+        'London',
+        'Paris',
+        'Stockholm',
+        'New_York',
+        'Los_Angeles',
+        'Singapore',
+        'Sydney',
+        'Hong_Kong',
+        'Rome'
+    ]
+
+    # Get date parameters
+    today = datetime.date.today() # datetime object
+
+    day7next = str(today + datetime.timedelta(7))# "yyyy-mm-dd"
+    day7ago = str(today - datetime.timedelta(7)) # "yyyy-mm-dd"
+
+    # Parse and insert updated data from observations endpoint
+    observations_batch = pd.DataFrame()
+    for city_name in city_names:
+        weather_df_temp, metadata_temp = get_weather_data(city_name, forecast=False,
+                                                            start_date=day7ago, end_date=day7ago)
+        observations_batch = pd.concat([observations_batch, weather_df_temp])
+        
+    # Parse and insert new data from forecast endpoint for new day in future
+    forecast_batch = pd.DataFrame()
+
+    for city_name in city_names:
+        weather_df_temp, metadata_temp = get_weather_data(city_name, forecast=True,
+                                                            start_date=day7next, end_date=day7next)
+        forecast_batch = pd.concat([forecast_batch, weather_df_temp])
+
+    return observations_batch, forecast_batch
+
+
 project = hopsworks.login(project='weather')
 
 fs = project.get_feature_store() 
-
+  
 weather_fg = fs.get_or_create_feature_group(
         name='weather_data',
         version=1
     )
-        
-city_names = [
-    'Kyiv',
-    'London',
-    'Paris',
-    'Stockholm',
-    'New_York',
-    'Los_Angeles',
-    'Singapore',
-    'Sydney',
-    'Hong_Kong',
-    'Rome'
-]
-# Get date parameters
-today = datetime.date.today() # datetime object
 
-day7next = str(today + datetime.timedelta(7))# "yyyy-mm-dd"
-day7ago = str(today - datetime.timedelta(7)) # "yyyy-mm-dd"
+observations_batch, forecast_batch = data_preparation(weather_fg)
 
-# Parse and insert updated data from observations endpoint
-observations_batch = pd.DataFrame()
-for city_name in city_names:
-    weather_df_temp, metadata_temp = get_weather_data(city_name, forecast=False,
-                                                        start_date=day7ago, end_date=day7ago)
-    observations_batch = pd.concat([observations_batch, weather_df_temp])
-    
 weather_fg.insert(observations_batch, write_options={"wait_for_job": False})
-
-# Parse and insert new data from forecast endpoint for new day in future
-forecast_batch = pd.DataFrame()
-
-for city_name in city_names:
-    weather_df_temp, metadata_temp = get_weather_data(city_name, forecast=True,
-                                                        start_date=day7next, end_date=day7next)
-    forecast_batch = pd.concat([forecast_batch, weather_df_temp])
-
 weather_fg.insert(forecast_batch, write_options={"wait_for_job": False})
