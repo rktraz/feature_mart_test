@@ -22,30 +22,23 @@ Requests using API from [open-meteo](https://open-meteo.com).
 
 
 # 🗓️ Scheduling
-To schedule a Feature Pipeline we are using [modal](https://modal.com/home).
+To schedule a Feature Pipeline we are using [GitHub Actions](https://github.com/features/actions).
 
-## ⚙️ Modal Set Up
-1. [Sign up](https://modal.com/signup) with your GitHub.
+## ⚙️ GitHub Actions Set Up
+1. `feature_pipeline_weather.yml` will set up a workflow for you. It will run every day at 00:00.
 
-2. Download and configure the Python client.
-```
-pip install modal-client
-modal token new
-```
-
-3. [Set up](https://modal.com/secrets) Hopsworks API Key.
+2. Get your Hopsworks API Key.
 
 `HOPSWORKS_API_KEY`
 
 ![2.png](images/api_key.png)
-![3.png](images/secrets.png)
-![4.png](images/custom_secret.png)
-![5.png](images/creation1.png)
-![6.png](images/creation2.png)
 
-## 🚀 Run Modal Pipeline
-Use the next command to run Modal pipeline ⬇️
 
-`modal run pipeline_public_weather_fg.py`
+3. Add your `HOPSWORKS_API_KEY` to **Actions secrets and variables**.
 
-You can find your Modal App [here](https://modal.com/apps).
+![3.png](images/set_up_api.png)
+![4.png](images/create_api.png)
+
+4. Besides scheduling, you can run your workflow manually.
+![5.png](images/github_actions.png)
+![6.png](images/feature_pipe_run.png)
