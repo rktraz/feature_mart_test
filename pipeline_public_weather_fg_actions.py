@@ -104,7 +104,7 @@ def get_weather_data(city_name: str,
     return res_df, some_metadata
 
 
-def data_preparation(weather_fg):
+def data_preparation():
     # Define required cities
     city_names = [
         'Kyiv',
@@ -143,16 +143,16 @@ def data_preparation(weather_fg):
     return observations_batch, forecast_batch
 
 
-project = hopsworks.login(project='weather')
+# project = hopsworks.login(project='weather')
 
-fs = project.get_feature_store() 
+# fs = project.get_feature_store() 
   
-weather_fg = fs.get_or_create_feature_group(
-        name='weather_data',
-        version=1
-    )
+# weather_fg = fs.get_or_create_feature_group(
+#         name='weather_data',
+#         version=1
+#     )
 
-observations_batch, forecast_batch = data_preparation(weather_fg)
+observations_batch, forecast_batch = data_preparation()
 
-weather_fg.insert(observations_batch, write_options={"wait_for_job": False})
-weather_fg.insert(forecast_batch, write_options={"wait_for_job": False})
+# weather_fg.insert(observations_batch, write_options={"wait_for_job": False})
+# weather_fg.insert(forecast_batch, write_options={"wait_for_job": False})
