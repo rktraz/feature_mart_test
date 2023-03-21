@@ -125,6 +125,8 @@ def data_preparation():
     day7next = str(today + datetime.timedelta(7))# "yyyy-mm-dd"
     day7ago = str(today - datetime.timedelta(7)) # "yyyy-mm-dd"
 
+    print('observations_batch in progress')
+
     # Parse and insert updated data from observations endpoint
     observations_batch = pd.DataFrame()
     for city_name in city_names:
@@ -132,6 +134,8 @@ def data_preparation():
                                                             start_date=day7ago, end_date=day7ago)
         observations_batch = pd.concat([observations_batch, weather_df_temp])
         
+    print('forecast_batch in progress')
+
     # Parse and insert new data from forecast endpoint for new day in future
     forecast_batch = pd.DataFrame()
 
@@ -140,6 +144,7 @@ def data_preparation():
                                                             start_date=day7next, end_date=day7next)
         forecast_batch = pd.concat([forecast_batch, weather_df_temp])
 
+    print('Done')
     return observations_batch, forecast_batch
 
 
@@ -153,6 +158,6 @@ def data_preparation():
 #     )
 
 observations_batch, forecast_batch = data_preparation()
-
+print('Super Done!')
 # weather_fg.insert(observations_batch, write_options={"wait_for_job": False})
 # weather_fg.insert(forecast_batch, write_options={"wait_for_job": False})
