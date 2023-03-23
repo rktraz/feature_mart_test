@@ -155,16 +155,20 @@ if __name__=="__main__":
 
 
     print("Now lets connect to HOPSWORKS")
-    # project = hopsworks.login(project='weather')
 
-    # fs = project.get_feature_store() 
+    import hopsworks
+
     
-    # print("Get weather FG")
-    # weather_fg = fs.get_or_create_feature_group(
-    #         name='weather_data',
-    #         version=1
-    #     )
+    project = hopsworks.login(project='weather')
+
+    fs = project.get_feature_store() 
     
-    # print("Started inserting into FGs")
-    # weather_fg.insert(observations_batch, write_options={"wait_for_job": False})
-    # weather_fg.insert(forecast_batch, write_options={"wait_for_job": False})
+    print("Get weather FG")
+    weather_fg = fs.get_or_create_feature_group(
+            name='weather_data',
+            version=1
+        )
+    
+    print("Started inserting into FGs")
+    weather_fg.insert(observations_batch, write_options={"wait_for_job": False})
+    weather_fg.insert(forecast_batch, write_options={"wait_for_job": False})
