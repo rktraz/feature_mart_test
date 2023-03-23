@@ -157,7 +157,13 @@ def data_preparation():
 #         version=1
 #     )
 
-observations_batch, forecast_batch = data_preparation()
-print('Super Done!')
+# observations_batch, forecast_batch = data_preparation()
+# print('Super Done!')
 # weather_fg.insert(observations_batch, write_options={"wait_for_job": False})
 # weather_fg.insert(forecast_batch, write_options={"wait_for_job": False})
+
+if __name__=="__main__":
+    print("Hello WORLD 1")
+    x, meta = get_weather_data("London", "2018-01-01", "2018-05-01", False)
+    print("Success!")
+    print(meta)
